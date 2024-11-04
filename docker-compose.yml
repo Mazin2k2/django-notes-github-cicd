@@ -4,10 +4,10 @@ services:
   jenkins:
     image: "jenkins/jenkins:lts"
     ports:
-      - "8080:8080"
-      - "50000:50000"
+      - "8080:8080"  # Host port 8080 to container port 8080
+      - "50000:50000"  # For Jenkins agent connections
   
   web:
     image: "maizmazin/practice-app:latest"
     ports:
-      - "8081:8080"
+      - "8082:8080"  # Host port 8082 to container port 8080
