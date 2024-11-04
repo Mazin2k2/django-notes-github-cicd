@@ -17,10 +17,10 @@ pipeline {
         }
         stage("push") {
             steps {
-                withCredentials([usernamePassword(credentialsId: "dockerHub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser ")]) {
-                    sh "echo ${env.dockerHubPass} | docker login -u ${env.dockerHubUser } --password-stdin"
-                    sh "docker tag practice-app:latest ${env.dockerHubUser }/practice-app:latest"
-                    sh "docker push ${env.dockerHubUser }/practice-app:latest"
+                withCredentials([usernamePassword(credentialsId: "dockerHub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
+                    sh "echo ${env.dockerHubPass} | docker login -u ${env.dockerHubUser} --password-stdin"
+                    sh "docker tag practice-app:latest ${env.dockerHubUser}/practice-app:latest"
+                    sh "docker push ${env.dockerHubUser}/practice-app:latest"
                     echo 'Image Pushed'
                 }
             }
@@ -28,7 +28,7 @@ pipeline {
         stage("deploy") {
             steps {
                 script {
-                    def image = "${env.dockerHubUser }/practice-app:latest"
+                    def image = "${env.dockerHubUser}/practice-app:latest"
                     echo "Deploying image: ${image}"
                     
                     // Stop and remove existing containers
