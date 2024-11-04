@@ -27,8 +27,9 @@ pipeline {
         }
         stage("deploy") {
             steps {
-                sh "docker stop $(docker ps -q --filter ancestor=${env.dockerHubUser}/practice-app:latest) || true"
-                sh "docker rm $(docker ps -aq --filter ancestor=${env.dockerHubUser}/practice-app:latest) || true"
+                sh "docker stop \$(docker ps -q --filter ancestor=${env.dockerHubUser}/practice-app:latest) || true"
+                sh "docker rm \$(docker ps -aq --filter ancestor=${env.dockerHubUser}/practice-app:latest) || true"
+                sh "docker rmi \$(docker images -q ${env.dockerHubUser}/practice-app:latest) || true"
                 sh "docker run -d -p 8080:8080 --name practice-app ${env.dockerHubUser}/practice-app:latest"
                 echo 'Deployment Done'
             }
