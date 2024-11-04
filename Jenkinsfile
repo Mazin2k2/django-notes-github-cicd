@@ -27,21 +27,7 @@ pipeline {
         }
         stage("deploy") {
             steps {
-                script {
-                    def image = "${env.dockerHubUser}/practice-app:latest"
-                    echo "Deploying image: ${image}"
-                    
-                    // Stop and remove existing containers
-                    sh "docker stop \$(docker ps -q --filter ancestor=${image}) || true"
-                    sh "docker rm \$(docker ps -aq --filter ancestor=${image}) || true"
-                    
-                    // Remove the image
-                    sh "docker rmi \$(docker images -q ${image}) || true"
-                    
-                    // Run the new container
-                    sh "docker run -d -p 8080:8080 --name practice-app ${image}"
-                    echo 'Deployment Done'
-                }
+                sh "docker run -d -p 8080:8080 --name practice-app ${env.dockerHubUser}/practice-app:latest"
             }
         }
     }
