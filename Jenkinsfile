@@ -5,7 +5,7 @@ pipeline {
         
         stage("code") {
             steps {
-                git url: "https://github.com/Mazin2k2/node-todo-app-pipelined", branch: "master"
+                git url: "https://github.com/Mazin2k2/django-notes-app.git", branch: "main"
                 echo 'Code Cloned'
             }
         }
