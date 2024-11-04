@@ -35,7 +35,7 @@ pipeline {
                         sh "docker rm practice-app"
                     }
                     // Run the new container
-                    sh "docker run -d -p 8080:8080 --name practice-app ${env.dockerHubUser}/practice-app:latest"
+                    sh "docker run -d -p 8080:8080 --name practice-app maizmazin/practice-app:latest"
                 }
             }
         }
