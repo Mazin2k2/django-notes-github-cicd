@@ -9,25 +9,22 @@ pipeline {
                 echo 'Code Cloned'
             }
         }
-        
         stage("build and test") {
             steps {
                 sh "docker build -t practice-app ."
                 echo 'Code Built'
             }
         }
-        
         stage("push") {
             steps {
-                withCredentials([usernamePassword(credentialsId: "dockerHub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
-                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                    sh "docker tag practice-app:latest ${env.dockerHubUser}/practice-app:latest"
-                    sh "docker push ${env.dockerHubUser}/practice-app:latest"
-                    echo 'Image Pushed'
+                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
+                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                sh "docker tag practice-app:latest ${env.dockerHubUser}/practice-app:latest"
+                sh "docker push ${env.dockerHubUser}/practice-app:latest"
+                echo 'Image Pushed'
                 }
             }
         }
-        
         stage("deploy") {
             steps {
                 script {
