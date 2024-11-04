@@ -14,4 +14,3 @@ class hello:
 
 if __name__ == "__main__":
     app.run()
-Dockerfile for this code
