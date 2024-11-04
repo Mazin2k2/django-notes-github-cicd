@@ -26,17 +26,8 @@ pipeline {
         }
         stage("deploy") {
             steps {
-                script {
-                    // Check if the container is already running
-                    def containerStatus = sh(script: "docker ps -q -f name=practice-app", returnStdout: true).trim()
-                    if (containerStatus) {
-                        // Stop and remove the existing container
-                        sh "docker stop practice-app"
-                        sh "docker rm practice-app"
-                    }
-                    // Run the new container
-                    sh "docker run -d -p 8080:8080 --name practice-app maizmazin/practice-app:latest"
-                }
+                echo "Deploying the container"
+                sh "docker-compose down && docker-compose up -d"
             }
         }
     }
