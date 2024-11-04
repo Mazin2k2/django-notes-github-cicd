@@ -17,17 +17,24 @@ pipeline {
         }
         stage("push") {
             steps {
-                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                sh "docker tag practice-app:latest ${env.dockerHubUser}/practice-app:latest"
-                sh "docker push ${env.dockerHubUser}/practice-app:latest"
-                echo 'Image Pushed'
+                withCredentials([usernamePassword(credentialsId: "dockerHub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
+                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                    sh "docker tag practice-app:latest ${env.dockerHubUser}/practice-app:latest"
+                    sh "docker push ${env.dockerHubUser}/practice-app:latest"
+                    echo 'Image Pushed'
                 }
             }
         }
         stage("deploy") {
             steps {
-                sh "docker run -d -p 8080:8080 --name practice-app ${env.dockerHubUser}/practice-app:latest"
+                script {
+                    def image = "${env.dockerHubUser}/practice-app:latest"
+                    echo "Running container from image: ${image}"
+                    
+                    // Run the container
+                    sh "docker run -d -p 8080:8080 --name practice-app ${image}"
+                    echo 'Container Deployed'
+                }
             }
         }
     }
