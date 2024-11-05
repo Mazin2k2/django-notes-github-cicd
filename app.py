@@ -10,7 +10,7 @@ class hello:
     def GET(self, name):
         if not name:
             name = 'World'
-        return 'Hello, ' + name + '!'
+        return 'Hello welcome, ' + name + '!'
 
 if __name__ == "__main__":
     app.run()
