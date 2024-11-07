@@ -64,25 +64,22 @@ jobs:
           echo "$EC2_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
 
-          # SSH into EC2 and pull the new Docker image and deploy
+          # SSH into EC2 and deploy
           ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
-            # Install Docker Compose if not installed
-            if ! command -v docker-compose &> /dev/null
-            then
-              sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d '"' -f 4)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              sudo chmod +x /usr/local/bin/docker-compose
-              docker-compose --version
+            # Navigate to the home directory
+            cd /home/$EC2_USER
+
+            # Clone the repository
+            git clone https://github.com/Mazin2k2/django-notes-github-cicd.git
+
+            # Navigate to the project directory
+            cd /home/$EC2_USER/django-notes-github-cicd
+
+            # Ensure docker-compose.yml is present
+            if [ ! -f "docker-compose.yml" ]; then
+              echo "docker-compose.yml not found in the project directory!"
+              exit 1
             fi
-
-            # Pull the latest Docker image from Docker Hub
-            docker pull $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG
-
-            # Debugging: Check the directory to ensure it exists
-            echo "Listing the contents of /home/$EC2_USER"
-            ls /home/$EC2_USER
-
-            # Navigate to the correct directory (replace with actual path)
-            cd /home/$EC2_USER/django-notes-github-cicd  # Replace with your actual app path
 
             # Restart the application using Docker Compose
             docker-compose down
