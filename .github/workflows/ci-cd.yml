@@ -1,3 +1,13 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Trigger workflow when code is pushed to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger workflow when a pull request is opened/updated on the main branch
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -5,7 +15,7 @@ jobs:
     env:
       IMAGE_NAME: "practice-app"
       DOCKER_REPO: "maizmazin"
-      TAG: "${{ github.run_number }}"
+      TAG: "${{ github.run_id }}"
 
     steps:
       - name: Checkout Code
