@@ -51,6 +51,7 @@ jobs:
           docker-compose --version
 
       # Deploy to EC2 using SSH
+           # Deploy to EC2 using SSH
       - name: Deploy to EC2
         env:
           IMAGE_REPO: ${{ env.DOCKER_REPO }}
@@ -69,11 +70,16 @@ jobs:
             # Navigate to the home directory
             cd /home/ubuntu
 
-            # Clone the repository
-            sudo git clone https://github.com/Mazin2k2/django-notes-github-cicd.git
-
-            # Navigate to the project directory
-            cd /home/ubuntu/django-notes-github-cicd
+            # Check if the directory exists
+            if [ -d "django-notes-github-cicd" ]; then
+              # If the directory exists, pull the latest changes
+              cd django-notes-github-cicd
+              sudo git pull origin main
+            else
+              # If the directory doesn't exist, clone the repo
+              sudo git clone https://Mazin2k2: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@github.com/Mazin2k2/django-notes-github-cicd.git
+              cd django-notes-github-cicd
+            fi
 
             # Ensure docker-compose.yml is present
             if [ ! -f "docker-compose.yml" ]; then
