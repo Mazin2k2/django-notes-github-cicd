@@ -33,7 +33,9 @@ pipeline {
         stage("deploy") {
             steps {
                 echo "Deploying the container"
+                withEnv(["DOCKER_REPO=${DOCKER_REPO}", "IMAGE_NAME=${IMAGE_NAME}", "IMAGE_TAG=${IMAGE_TAG}"]) {
                 sh "docker-compose down && docker-compose up -d"
+                }
             }
         }
     }
