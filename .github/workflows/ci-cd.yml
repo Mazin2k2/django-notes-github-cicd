@@ -66,6 +66,11 @@ jobs:
 
           # SSH into EC2 and deploy
           ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
+            # Export environment variables for Docker Compose
+            export DOCKER_REPO="${DOCKER_REPO}"
+            export IMAGE_NAME="${IMAGE_NAME}"
+            export IMAGE_TAG="${IMAGE_TAG}"
+
             # Ensure the directory exists
             if [ ! -d "/home/ubuntu/django-notes-github-cicd" ]; then
               echo "Directory /home/ubuntu/django-notes-github-cicd does not exist!"
