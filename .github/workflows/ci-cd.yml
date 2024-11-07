@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger workflow when code is pushed to the main branch
+      - main
   pull_request:
     branches:
-      - main  # Trigger workflow when a pull request is opened/updated on the main branch
+      - main
 
 jobs:
   build-and-deploy:
@@ -50,11 +50,6 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      # Debugging: Check Docker Image Variables
-      - name: Debug Docker Image Variables
-        run: |
-          echo "Image: $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG"
-
       # Deploy to EC2 using SSH
       - name: Deploy to EC2
         env:
@@ -82,8 +77,12 @@ jobs:
             # Pull the latest Docker image from Docker Hub
             docker pull $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG
 
-            # Navigate to the directory with the Docker Compose file
-            cd /home/ubuntu/my-app  # Update this with the actual path
+            # Debugging: Check the directory to ensure it exists
+            echo "Listing the contents of /home/$EC2_USER"
+            ls /home/$EC2_USER
+
+            # Navigate to the correct directory (replace with actual path)
+            cd /home/$EC2_USER/my-app  # Replace with your actual app path
 
             # Restart the application using Docker Compose
             docker-compose down
