@@ -17,7 +17,7 @@ jobs:
       DOCKER_REPO: "maizmazin"
       TAG: "${{ github.run_id }}"
       EC2_HOST: ${{ secrets.EC2_HOST }}
-      EC2_USER: ${{ secrets.EC2_USER }}
+      EC2_USER: "ubuntu"  # Replaced $EC2_USER with "ubuntu"
       EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}  # SSH private key for EC2
 
     steps:
@@ -57,7 +57,7 @@ jobs:
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
           IMAGE_TAG: ${{ env.TAG }}
           EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_USER: "ubuntu"  # Replaced $EC2_USER with "ubuntu"
           EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
         run: |
           # Save EC2 private key to a file
@@ -67,13 +67,13 @@ jobs:
           # SSH into EC2 and deploy
           ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
             # Navigate to the home directory
-            cd /home/$EC2_USER
+            cd /home/ubuntu
 
             # Clone the repository
             sudo git clone https://github.com/Mazin2k2/django-notes-github-cicd.git
 
             # Navigate to the project directory
-            cd /home/$EC2_USER/django-notes-github-cicd
+            cd /home/ubuntu/django-notes-github-cicd
 
             # Ensure docker-compose.yml is present
             if [ ! -f "docker-compose.yml" ]; then
