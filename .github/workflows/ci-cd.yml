@@ -52,8 +52,7 @@ jobs:
         env:
           DOCKER_REPO: ${{ env.DOCKER_REPO }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
-          TAG: ${{ env.TAG }}
+          IMAGE_TAG: ${{ env.TAG }}
         run: |
           docker-compose down
           docker-compose up -d
-          echo "Deployment completed"
