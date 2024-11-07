@@ -17,8 +17,8 @@ jobs:
       DOCKER_REPO: "maizmazin"
       TAG: "${{ github.run_id }}"
       EC2_HOST: ${{ secrets.EC2_HOST }}
-      EC2_USER: "ubuntu"  # Replaced $EC2_USER with "ubuntu"
-      EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}  # SSH private key for EC2
+      EC2_USER: "ubuntu"
+      EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
 
     steps:
       - name: Checkout Code
@@ -57,7 +57,7 @@ jobs:
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
           IMAGE_TAG: ${{ env.TAG }}
           EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_USER: "ubuntu"  # Replaced $EC2_USER with "ubuntu"
+          EC2_USER: "ubuntu"
           EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
         run: |
           # Save EC2 private key to a file
@@ -70,8 +70,7 @@ jobs:
             cd /home/ubuntu
 
             # Clone the repository
-            sudo git clone https://Mazin2k2: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@github.com/Mazin2k2/django-notes-github-cicd.git
-
+            sudo git clone https://github.com/Mazin2k2/django-notes-github-cicd.git
 
             # Navigate to the project directory
             cd /home/ubuntu/django-notes-github-cicd
@@ -81,6 +80,11 @@ jobs:
               echo "docker-compose.yml not found in the project directory!"
               exit 1
             fi
+
+            # Set the Docker image name and tag
+            IMAGE_REPO="${DOCKER_REPO}"
+            IMAGE_NAME="${IMAGE_NAME}"
+            IMAGE_TAG="${IMAGE_TAG}"
 
             # Restart the application using Docker Compose
             docker-compose down
