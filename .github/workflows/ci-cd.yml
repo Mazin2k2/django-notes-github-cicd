@@ -16,6 +16,9 @@ jobs:
       IMAGE_NAME: "practice-app"
       DOCKER_REPO: "maizmazin"
       TAG: "${{ github.run_id }}"
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_USER: ${{ secrets.EC2_USER }}
+      EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}  # SSH private key for EC2
 
     steps:
       - name: Checkout Code
@@ -47,12 +50,32 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      # Deploy with Docker Compose
-      - name: Deploy with Docker Compose
+      # Deploy to EC2 using SSH
+      - name: Deploy to EC2
         env:
-          DOCKER_REPO: ${{ env.DOCKER_REPO }}
+          IMAGE_REPO: ${{ env.DOCKER_REPO }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
           IMAGE_TAG: ${{ env.TAG }}
+          EC2_HOST: ${{ env.EC2_HOST }}
+          EC2_USER: ${{ env.EC2_USER }}
+          EC2_PRIVATE_KEY: ${{ env.EC2_PRIVATE_KEY }}
         run: |
-          docker-compose down
-          docker-compose up -d
+          # Save EC2 private key to a file
+          echo "$EC2_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+
+          # SSH into EC2 and pull the new Docker image and deploy
+          ssh -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
+            # Pull the latest Docker image from Docker Hub
+            docker pull $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG
+
+            # Navigate to the directory with the Docker Compose file (adjust if needed)
+            cd /path/to/your/app
+
+            # Restart the application using Docker Compose
+            docker-compose down
+            docker-compose up -d
+          EOF
+
+          # Clean up the private key file
+          rm private_key.pem
