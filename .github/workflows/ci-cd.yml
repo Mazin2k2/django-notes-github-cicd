@@ -82,7 +82,7 @@ jobs:
             ls /home/$EC2_USER
 
             # Navigate to the correct directory (replace with actual path)
-            cd /home/$EC2_USER/my-app  # Replace with your actual app path
+            cd /home/$EC2_USER/django-notes-github-cicd  # Replace with your actual app path
 
             # Restart the application using Docker Compose
             docker-compose down
