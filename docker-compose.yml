@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   web:
-    image: "maizmazin/practice-app:latest"
+    image: "${DOCKER_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"  # Use the environment variable for the tag
     ports:
-      - "8083:8080"  # Host port 8082 to container port 8080
+      - "8083:8080"
+
