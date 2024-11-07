@@ -70,7 +70,7 @@ jobs:
             cd /home/$EC2_USER
 
             # Clone the repository
-            git clone https://github.com/Mazin2k2/django-notes-github-cicd.git
+            sudo git clone https://github.com/Mazin2k2/django-notes-github-cicd.git
 
             # Navigate to the project directory
             cd /home/$EC2_USER/django-notes-github-cicd
