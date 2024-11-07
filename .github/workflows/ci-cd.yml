@@ -50,6 +50,11 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
+      # Debugging: Check Docker Image Variables
+      - name: Debug Docker Image Variables
+        run: |
+          echo "Image: $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG"
+
       # Deploy to EC2 using SSH
       - name: Deploy to EC2
         env:
@@ -66,11 +71,19 @@ jobs:
 
           # SSH into EC2 and pull the new Docker image and deploy
           ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
+            # Install Docker Compose if not installed
+            if ! command -v docker-compose &> /dev/null
+            then
+              sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d '"' -f 4)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+              docker-compose --version
+            fi
+
             # Pull the latest Docker image from Docker Hub
             docker pull $IMAGE_REPO/$IMAGE_NAME:$IMAGE_TAG
 
-            # Navigate to the directory with the Docker Compose file (adjust if needed)
-            cd /path/to/your/app
+            # Navigate to the directory with the Docker Compose file
+            cd /home/ubuntu/my-app  # Update this with the actual path
 
             # Restart the application using Docker Compose
             docker-compose down
