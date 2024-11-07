@@ -66,8 +66,11 @@ jobs:
 
           # SSH into EC2 and deploy
           ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
-            # Navigate to the home directory
-            cd /home/ubuntu
+            # Ensure the directory exists
+            if [ ! -d "/home/ubuntu/django-notes-github-cicd" ]; then
+              echo "Directory /home/ubuntu/django-notes-github-cicd does not exist!"
+              exit 1
+            fi
 
             # Navigate to the project directory
             cd /home/ubuntu/django-notes-github-cicd
@@ -82,6 +85,9 @@ jobs:
             IMAGE_REPO="${DOCKER_REPO}"
             IMAGE_NAME="${IMAGE_NAME}"
             IMAGE_TAG="${IMAGE_TAG}"
+
+            # Pull the latest image from Docker Hub
+            docker-compose pull
 
             # Restart the application using Docker Compose
             docker-compose down
