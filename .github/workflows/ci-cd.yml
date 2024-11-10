@@ -69,13 +69,20 @@ jobs:
           # Copy deploy.sh to EC2
           scp -o StrictHostKeyChecking=no -i private_key.pem ./scripts/deploy.sh $EC2_USER@$EC2_HOST:/home/ubuntu/deploy.sh
 
-          # SSH into EC2 and run the deploy script
-          ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
+          # SSH into EC2 and run the deploy script with environment variables
+          ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << EOF
+            # Export environment variables in the remote shell
+            export DOCKER_REPO="${{ env.DOCKER_REPO }}"
+            export IMAGE_NAME="${{ env.IMAGE_NAME }}"
+            export IMAGE_TAG="${{ env.TAG }}"
+            export GITHUB_OWNER="${{ github.repository_owner }}"
+            export GITHUB_REPOSITORY="${{ github.repository }}"
+
             # Make the deploy script executable
             chmod +x /home/ubuntu/deploy.sh
 
-            # Run the deploy script with arguments
-            /home/ubuntu/deploy.sh $DOCKER_REPO $IMAGE_NAME $IMAGE_TAG $GITHUB_OWNER $GITHUB_REPOSITORY
+            # Run the deploy script with the environment variables
+            /home/ubuntu/deploy.sh \$DOCKER_REPO \$IMAGE_NAME \$IMAGE_TAG \$GITHUB_OWNER \$GITHUB_REPOSITORY
           EOF
 
           # Clean up the private key file after SSH commands have executed
