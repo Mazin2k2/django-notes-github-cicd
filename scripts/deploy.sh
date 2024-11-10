@@ -7,6 +7,7 @@ export IMAGE_TAG="$3"
 export GITHUB_OWNER="$4"
 export GITHUB_REPOSITORY="$5"
 
+# Set Git safe directory
 git config --global --add safe.directory /home/ubuntu/django-notes-github-cicd
 
 # Define project directory
@@ -17,6 +18,7 @@ if [ ! -d "$PROJECT_DIR" ]; then
   echo "Directory $PROJECT_DIR does not exist! Cloning the repository..."
   # Clone the repository if the directory does not exist
   git clone https://github.com/$GITHUB_OWNER/$GITHUB_REPOSITORY.git $PROJECT_DIR
+  sudo chown -R $USER:$USER $PROJECT_DIR  # Change ownership to the current user
 else
   echo "Directory $PROJECT_DIR exists. Pulling latest changes..."
   # Navigate to the project directory and pull the latest changes
@@ -30,10 +32,12 @@ if [ ! -f "$PROJECT_DIR/docker-compose.yml" ]; then
   exit 1
 fi
 
+# Debugging: Print image details
+echo "Using image: $DOCKER_REPO/$IMAGE_NAME:$IMAGE_TAG"
+
 # Pull the latest image from Docker Hub using Docker Compose
 docker-compose pull
 
 # Restart the application using Docker Compose
 docker-compose down
 docker-compose up -d
-
