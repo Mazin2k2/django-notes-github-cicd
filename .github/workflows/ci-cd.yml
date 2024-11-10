@@ -19,6 +19,8 @@ jobs:
       EC2_HOST: ${{ secrets.EC2_HOST }}
       EC2_USER: "ubuntu"
       EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      GITHUB_OWNER: ${{ github.repository_owner }}
 
     steps:
       - name: Checkout Code
@@ -50,8 +52,8 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      # Deploy to EC2 using SSH
-      - name: Deploy to EC2
+      # Upload and execute deploy script on EC2
+      - name: Upload and run deployment script on EC2
         env:
           IMAGE_REPO: ${{ env.DOCKER_REPO }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
@@ -64,40 +66,52 @@ jobs:
           echo "$EC2_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
 
-          # SSH into EC2 and deploy
-          ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
-            # Export environment variables for Docker Compose
-            export DOCKER_REPO="${DOCKER_REPO}"
-            export IMAGE_NAME="${IMAGE_NAME}"
-            export IMAGE_TAG="${IMAGE_TAG}"
+          # Create the deploy.sh script
+          cat > deploy.sh << EOF
+#!/bin/bash
 
-            # Ensure the directory exists
-            if [ ! -d "/home/ubuntu/django-notes-github-cicd" ]; then
-              echo "Directory /home/ubuntu/django-notes-github-cicd does not exist!"
-              exit 1
-            fi
+# Export environment variables for Docker Compose
+export DOCKER_REPO="${{ env.DOCKER_REPO }}"
+export IMAGE_NAME="${{ env.IMAGE_NAME }}"
+export IMAGE_TAG="${{ env.TAG }}"
+export GITHUB_OWNER="${{ env.GITHUB_OWNER }}"
+export GITHUB_REPOSITORY="${{ env.GITHUB_REPOSITORY }}"
 
-            # Navigate to the project directory
-            cd /home/ubuntu/django-notes-github-cicd
+# Define project directory
+PROJECT_DIR="/home/ubuntu/django-notes-github-cicd"
 
-            # Ensure docker-compose.yml is present
-            if [ ! -f "docker-compose.yml" ]; then
-              echo "docker-compose.yml not found in the project directory!"
-              exit 1
-            fi
+# Check if the directory exists
+if [ ! -d "$PROJECT_DIR" ]; then
+  echo "Directory $PROJECT_DIR does not exist! Cloning the repository..."
+  # Clone the repository if the directory does not exist
+  git clone https://github.com/\$GITHUB_OWNER/\$GITHUB_REPOSITORY.git \$PROJECT_DIR
+else
+  echo "Directory $PROJECT_DIR exists. Pulling latest changes..."
+  # Navigate to the project directory and pull the latest changes
+  cd \$PROJECT_DIR
+  git pull origin main
+fi
 
-            # Set the Docker image name and tag
-            IMAGE_REPO="${DOCKER_REPO}"
-            IMAGE_NAME="${IMAGE_NAME}"
-            IMAGE_TAG="${IMAGE_TAG}"
+# Ensure docker-compose.yml is present
+if [ ! -f "\$PROJECT_DIR/docker-compose.yml" ]; then
+  echo "docker-compose.yml not found in the project directory!"
+  exit 1
+fi
 
-            # Pull the latest image from Docker Hub
-            docker-compose pull
+# Pull the latest image from Docker Hub using Docker Compose
+docker-compose pull
 
-            # Restart the application using Docker Compose
-            docker-compose down
-            docker-compose up -d
-          EOF
+# Restart the application using Docker Compose
+docker-compose down
+docker-compose up -d
+EOF
 
-          # Clean up the private key file
+          # Upload the deploy.sh script to the EC2 instance
+          scp -i private_key.pem -o StrictHostKeyChecking=no deploy.sh $EC2_USER@$EC2_HOST:/home/ubuntu/deploy.sh
+
+          # SSH into EC2 and execute the deploy.sh script
+          ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST "bash /home/ubuntu/deploy.sh"
+
+          # Clean up the private key file and the script on EC2
           rm private_key.pem
+          ssh -i private_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "rm /home/ubuntu/deploy.sh"
