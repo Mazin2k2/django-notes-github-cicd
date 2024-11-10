@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Export environment variables for Docker Compose
-export DOCKER_REPO="$1"
-export IMAGE_NAME="$2"
-export IMAGE_TAG="$3"
-export GITHUB_OWNER="$4"
-export GITHUB_REPOSITORY="$5"
-
 # Set Git safe directory
 git config --global --add safe.directory /home/ubuntu/django-notes-github-cicd
 
