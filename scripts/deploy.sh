@@ -18,11 +18,11 @@ if [ ! -d "$PROJECT_DIR" ]; then
   echo "Directory $PROJECT_DIR does not exist! Cloning the repository..."
   # Clone the repository if the directory does not exist
   git clone https://github.com/$GITHUB_OWNER/$GITHUB_REPOSITORY.git $PROJECT_DIR
-  sudo chown -R $USER:$USER $PROJECT_DIR  # Change ownership to the current user
 else
   echo "Directory $PROJECT_DIR exists. Pulling latest changes..."
   # Navigate to the project directory and pull the latest changes
   cd $PROJECT_DIR
+  sudo chown -R $USER:$USER $PROJECT_DIR  # Ensure ownership
   git pull origin main
 fi
 
