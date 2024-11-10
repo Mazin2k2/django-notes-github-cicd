@@ -75,7 +75,7 @@ jobs:
             chmod +x /home/ubuntu/deploy.sh
 
             # Run the deploy script with arguments
-            /home/ubuntu/deploy.sh "${DOCKER_REPO}" "${IMAGE_NAME}" "${IMAGE_TAG}" "${GITHUB_OWNER}" "${GITHUB_REPOSITORY}"
+            /home/ubuntu/deploy.sh "$DOCKER_REPO" "$IMAGE_NAME" "$IMAGE_TAG" "$GITHUB_OWNER" "$GITHUB_REPOSITORY"
           EOF
 
           # Clean up the private key file after SSH commands have executed
