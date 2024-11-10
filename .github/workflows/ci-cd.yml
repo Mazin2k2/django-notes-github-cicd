@@ -69,7 +69,7 @@ jobs:
           chmod 600 private_key.pem
 
           # Upload the deploy script to EC2
-          scp -i private_key.pem -o StrictHostKeyChecking=no deploy.sh $EC2_USER@$EC2_HOST:/home/ubuntu/deploy.sh
+          scp -i private_key.pem -o StrictHostKeyChecking=no scripts/deploy.sh $EC2_USER@$EC2_HOST:/home/ubuntu/deploy.sh
 
           # SSH into EC2 and run the deployment script
           ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
