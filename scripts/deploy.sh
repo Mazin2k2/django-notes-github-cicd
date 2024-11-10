@@ -7,6 +7,8 @@ export IMAGE_TAG="$3"
 export GITHUB_OWNER="$4"
 export GITHUB_REPOSITORY="$5"
 
+git config --global --add safe.directory /home/ubuntu/django-notes-github-cicd
+
 # Define project directory
 PROJECT_DIR="/home/ubuntu/django-notes-github-cicd"
 
