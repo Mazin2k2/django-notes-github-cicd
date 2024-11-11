@@ -45,14 +45,12 @@ jobs:
           docker push $DOCKER_REPO/$IMAGE_NAME:$TAG
           echo "Image pushed to Docker Hub as $DOCKER_REPO/$IMAGE_NAME:$TAG"
 
-      # Install Docker Compose
       - name: Install Docker Compose
         run: |
           sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d '"' -f 4)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      # Upload deploy.sh to EC2 and run it
       - name: Upload and run deploy.sh on EC2
         env:
           IMAGE_REPO: ${{ env.DOCKER_REPO }}
@@ -62,28 +60,22 @@ jobs:
           EC2_USER: "ubuntu"
           EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
         run: |
-          # Save EC2 private key to a file
+        
           echo "$EC2_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
 
-          # Copy deploy.sh to EC2
           scp -o StrictHostKeyChecking=no -i private_key.pem ./scripts/deploy.sh $EC2_USER@$EC2_HOST:/home/ubuntu/deploy.sh
 
-          # SSH into EC2 and run the deploy script with environment variables
           ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << EOF
-            # Export environment variables in the remote shell
             export DOCKER_REPO="${{ env.DOCKER_REPO }}"
             export IMAGE_NAME="${{ env.IMAGE_NAME }}"
             export IMAGE_TAG="${{ env.TAG }}"
             export GITHUB_OWNER="${{ github.repository_owner }}"
             export GITHUB_REPOSITORY="${{ github.repository }}"
 
-            # Make the deploy script executable
             chmod +x /home/ubuntu/deploy.sh
 
-            # Run the deploy script with the environment variables
             /home/ubuntu/deploy.sh \$DOCKER_REPO \$IMAGE_NAME \$IMAGE_TAG \$GITHUB_OWNER \$GITHUB_REPOSITORY
           EOF
 
-          # Clean up the private key file after SSH commands have executed
           rm private_key.pem
